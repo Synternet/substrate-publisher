@@ -1,7 +1,7 @@
 # Substrate publisher
-[![Latest release](https://img.shields.io/github/v/release/synternet/substrate-publisher)](https://github.com/synternet/substrate-publisher/releases/latest)
+[![Latest release](https://img.shields.io/github/v/release/Synternet/substrate-publisher)](https://github.com/Synternet/substrate-publisher/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/synternet/substrate-publisher/github-ci.yml?label=github-ci)](https://github.com/synternet/substrate-publisher/actions/workflows/github-ci.yml)
+[![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/Synternet/substrate-publisher/github-ci.yml?label=github-ci)](https://github.com/Synternet/substrate-publisher/actions/workflows/github-ci.yml)
 
 Establishes connection with Substrate blockchain based node and publishes blockchain data to Synternet via NATS connection.
 
