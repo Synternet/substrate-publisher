@@ -53,17 +53,17 @@ func Execute() {
 func init() {
 	const (
 		PUBLISHER_IDENTITY = "PUBLISHER_IDENTITY"
-		PUBLISHER_PREFIX   = "PUBLISHER_PREFIX"
+		STREAM_PREFIX      = "STREAM_PREFIX"
 	)
-	setDefault(PUBLISHER_PREFIX, "syntropy")
+	setDefault(STREAM_PREFIX, "synternet")
 
-	flagNatsUrls = rootCmd.PersistentFlags().StringP("nats", "n", os.Getenv("NATS_URL"), "NATS server URLs (separated by comma)")
+	flagNatsUrls = rootCmd.PersistentFlags().StringP("nats-urls", "n", os.Getenv("NATS_URLS"), "NATS server URLs (separated by comma)")
 	flagUserCreds = rootCmd.PersistentFlags().StringP("nats-creds", "c", os.Getenv("NATS_CREDS"), "NATS User Credentials File (combined JWT and NKey file) ")
 	flagJWT = rootCmd.PersistentFlags().StringP("nats-jwt", "w", os.Getenv("NATS_JWT"), "NATS JWT")
 	flagNkey = rootCmd.PersistentFlags().StringP("nats-nkey", "k", os.Getenv("NATS_NKEY"), "NATS NKey")
 	flagTLSKey = rootCmd.PersistentFlags().StringP("client-key", "", "", "NATS Private key file for client certificate")
 	flagTLSClientCert = rootCmd.PersistentFlags().StringP("client-cert", "", "", "NATS TLS client certificate file")
 	flagCACert = rootCmd.PersistentFlags().StringP("ca-cert", "", "", "NATS CA certificate file")
-	flagPrefixName = rootCmd.PersistentFlags().StringP("prefix", "", os.Getenv(PUBLISHER_PREFIX), "NATS topic prefix name as in {prefix}.solana")
+	flagPrefixName = rootCmd.PersistentFlags().StringP("stream-prefix", "", os.Getenv(STREAM_PREFIX), "NATS topic prefix name as in {prefix}.substrate")
 	flagVerbose = rootCmd.PersistentFlags().BoolP("verbose", "v", false, "Verbose output")
 }

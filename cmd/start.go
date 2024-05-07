@@ -63,13 +63,13 @@ func init() {
 	rootCmd.AddCommand(startCmd)
 
 	const (
-		SUBSTRATE_RPC  = "SUBSTRATE_RPC"
-		PUBLISHER_NAME = "PUBLISHER_NAME"
+		RPC_URL               = "RPC_URL"
+		STREAM_PUBLISHER_NAME = "STREAM_PUBLISHER_NAME"
 	)
 
-	setDefault(SUBSTRATE_RPC, "wss://rpc.polkadot.io")
-	setDefault(PUBLISHER_NAME, "polkadot")
+	setDefault(RPC_URL, "wss://rpc.polkadot.io")
+	setDefault(STREAM_PUBLISHER_NAME, "polkadot")
 
-	flagPublisherName = startCmd.Flags().StringP("name", "", os.Getenv(PUBLISHER_NAME), "NATS subject name as in {prefix}.{name}.>")
-	flagRPCAPI = startCmd.Flags().StringP("app-api", "a", os.Getenv(SUBSTRATE_RPC), "Full address to the Applications RPC")
+	flagPublisherName = startCmd.Flags().StringP("stream-publisher-name", "", os.Getenv(STREAM_PUBLISHER_NAME), "NATS subject name as in {prefix}.{publisher-name}.>")
+	flagRPCAPI = startCmd.Flags().StringP("rpc-url", "r", os.Getenv(RPC_URL), "Substrate RPC url")
 }

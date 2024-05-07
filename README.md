@@ -33,14 +33,13 @@ Running executable
 
 Environment variables can be passed to docker container. Flags can be passed as executable arguments.
 
-| Environment variable   | Flag                   | Description                                                                                                               |
-| ---------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| RPC_URL                | rpc-url                | Substrate node URI to establish RPC connection, e.g.: `wss://rpc.polkadot.io`                                             |
-| NATS_URLS              | nats-urls              | NATS connection URLs to Synternet brokers, e.g.: `nats://e.f.g.h`. URL to [broker](https://docs.synternet.com/docs/actors/broker). Default: testnet. |
-| NATS_NKEY              | nats-nkey              | NATS account NKEY a.k.a access token, e.g.: `SA..SI` (58 chars). See [here](https://docs.synternet.com/build/data-layer/developer-portal/publish-streams#7-get-the-access-token). |
-| STREAM_PREFIX          | stream-prefix          | Stream prefix, e.g.: `foo` prefix results in `foo.substrate.<tx,log-even,header,...>` stream subjects. Stream prefix should be same as registered wallet [alias](https://docs.synternet.com/build/data-layer/developer-portal/publish-streams#2-register-a-wallet---get-your-alias). |
-| STREAM_PUBLISHER_INFIX | stream-publisher-infix | (optional) Stream publisher infix, e.g.: `foo` infix results in `prefix.foo.<tx,log-even,header,...>` stream subjects. Stream publisher infix should be same as registered publisher [alias](https://docs.synternet.com/build/data-layer/developer-portal/publish-streams#3-register-a-publisher). Default: `substrate`. |
-| STREAM_NETWORK_INFIX   | stream-network-infix   | (optional) Specify stream network infix, e.g.: `mainnet` prefix results in `<prefix>.substrate.mainnet.<tx,...>` subjects. Default: empty (`prefix.substrate.<tx,...>`). |
+| Environment variable  | Flag                  | Description |
+| --------------------- | --------------------- | ----------- |
+| RPC_URL               | rpc-url               | Substrate node RPC url, e.g.: `wss://rpc.polkadot.io` |
+| NATS_URLS             | nats-urls             | NATS connection URLs to Synternet brokers, e.g.: `nats://e.f.g.h`. URL to [broker](https://docs.synternet.com/docs/actors/broker). Default: testnet. |
+| NATS_NKEY             | nats-nkey             | NATS account NKEY a.k.a access token, e.g.: `SA..SI` (58 chars). See [here](https://docs.synternet.com/build/data-layer/developer-portal/publish-streams#7-get-the-access-token). |
+| STREAM_PREFIX         | stream-prefix         | Stream prefix, usually your organisation, e.g.: `synternet` prefix results in `synternet.substrate.<tx,log-even,header,...>` stream subjects. Stream prefix should be same as registered wallet [alias](https://docs.synternet.com/build/data-layer/developer-portal/publish-streams#2-register-a-wallet---get-your-alias). |
+| STREAM_PUBLISHER_NAME | stream-publisher-name | (optional) Stream publisher infix, e.g.: `foo` infix results in `prefix.foo.<tx,log-even,header,...>` stream subjects. Stream publisher infix should be same as registered publisher [alias](https://docs.synternet.com/build/data-layer/developer-portal/publish-streams#3-register-a-publisher). Default: `substrate`. |
 
 See [Data Layer Quick Start](https://docs.synternet.com/build/data-layer/data-layer-quick-start) to learn more.
 
