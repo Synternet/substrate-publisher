@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"time"
 
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/registry"
@@ -68,7 +69,6 @@ type ExHeader struct {
 
 type Publisher struct {
 	*service.Service
-	api *gsrpc.SubstrateAPI
 }
 
 func New(opts ...options.Option) *Publisher {
@@ -78,36 +78,58 @@ func New(opts ...options.Option) *Publisher {
 
 	ret.Configure(opts...)
 
-	api, err := gsrpc.NewSubstrateAPI(ret.RPCApi())
-	if err != nil {
-		panic(err)
-	}
-	ret.api = api
-
 	return ret
 }
 
 func (p *Publisher) Start() context.Context {
+	ctx := context.Background()
 	go func() {
-		subNewHeads, err := p.api.RPC.Chain.SubscribeNewHeads()
-		if err != nil {
-			panic(err)
+		for {
+			if err := p.RunSubstrate(ctx); err != nil {
+				fmt.Println("Error while processing messages:", err)
+				retry := 10 * time.Second
+				fmt.Printf("Retrying in %f seconds...", retry.Seconds())
+				time.Sleep(retry)
+			} else {
+				break
+			}
 		}
-		defer subNewHeads.Unsubscribe()
+	}()
+	return p.Service.Start()
+}
 
-		retriever, err := retriever.NewDefaultEventRetriever(state.NewEventProvider(p.api.RPC.State), p.api.RPC.State)
-		if err != nil {
-			panic(err)
-		}
+func (p *Publisher) RunSubstrate(ctx context.Context) error {
+	log.Println("Connecting to substrate API...")
+	api, err := gsrpc.NewSubstrateAPI(p.RPCApi())
+	if err != nil {
+		return err
+	}
 
-		for head := range subNewHeads.Chan() {
+	log.Println("Subscribing to head...")
+	subNewHeads, err := api.RPC.Chain.SubscribeNewHeads()
+	if err != nil {
+		panic(err)
+	}
+	defer subNewHeads.Unsubscribe()
+
+	retriever, err := retriever.NewDefaultEventRetriever(state.NewEventProvider(api.RPC.State), api.RPC.State)
+	if err != nil {
+		panic(err)
+	}
+
+	for {
+		select {
+		case err := <-subNewHeads.Err():
+			api.Client.Close()
+			return err
+		case head := <-subNewHeads.Chan():
 			// Useful for testing peaq agung testnet
 			// headNumber := 2045829 // ItemAdded
 			// headNumber := 2043805 // ItemUpdated
 			// headNumber := 2008603 // ItemRead
-			// hash, err := p.api.RPC.Chain.GetBlockHash(uint64(headNumber))
+			// hash, err := api.RPC.Chain.GetBlockHash(uint64(headNumber))
 
-			hash, err := p.api.RPC.Chain.GetBlockHash(uint64(head.Number))
+			hash, err := api.RPC.Chain.GetBlockHash(uint64(head.Number))
 			if err != nil {
 				log.Fatalln(err)
 			}
@@ -115,7 +137,7 @@ func (p *Publisher) Start() context.Context {
 			events, err := retriever.GetEvents(hash)
 			if err != nil {
 				log.Printf("Couldn't retrieve events for block number %d: %s\n", head.Number, err)
-				return
+				continue
 			}
 
 			// PeaqStorage.* events are Peaq chain specific.
@@ -125,19 +147,19 @@ func (p *Publisher) Start() context.Context {
 					from, err := SS58AddrFromBalanceTransfer(e, 0, 0)
 					if err != nil {
 						log.Println(err)
-						return
+						continue
 					}
 
 					to, err := SS58AddrFromBalanceTransfer(e, 1, 0)
 					if err != nil {
 						log.Println(err)
-						return
+						continue
 					}
 
 					amount, ok := e.Fields[2].Value.(types.U128)
 					if !ok {
 						log.Println("Could not get amount")
-						return
+						continue
 					}
 
 					divisor := big.NewInt(1e10)
@@ -160,19 +182,19 @@ func (p *Publisher) Start() context.Context {
 					who, err := SS58AddrFromBalanceTransfer(e, 0, 42)
 					if err != nil {
 						log.Println(err)
-						return
+						continue
 					}
 
 					itemType, err := FromPeaqStorageItem(e, 1)
 					if err != nil {
 						log.Println(err)
-						return
+						continue
 					}
 
 					item, err := FromPeaqStorageItem(e, 2)
 					if err != nil {
 						log.Println(err)
-						return
+						continue
 					}
 
 					itemAdded := ItemAdded{Who: who, ItemType: itemType, Item: item}
@@ -193,19 +215,19 @@ func (p *Publisher) Start() context.Context {
 					who, err := SS58AddrFromBalanceTransfer(e, 0, 42)
 					if err != nil {
 						log.Println(err)
-						return
+						continue
 					}
 
 					itemType, err := FromPeaqStorageItem(e, 1)
 					if err != nil {
 						log.Println(err)
-						return
+						continue
 					}
 					//
 					item, err := FromPeaqStorageItem(e, 2)
 					if err != nil {
 						log.Println(err)
-						return
+						continue
 					}
 
 					itemUpdated := ItemUpdated{Who: who, ItemType: itemType, Item: item}
@@ -226,7 +248,7 @@ func (p *Publisher) Start() context.Context {
 					item, err := FromPeaqStorageItem(e, 0)
 					if err != nil {
 						log.Println(err)
-						return
+						continue
 					}
 
 					itemRead := ItemRead{Item: item}
@@ -246,7 +268,7 @@ func (p *Publisher) Start() context.Context {
 				}
 			}
 
-			block, err := p.api.RPC.Chain.GetBlock(hash)
+			block, err := api.RPC.Chain.GetBlock(hash)
 			if err != nil {
 				log.Fatalln(err)
 			}
@@ -264,8 +286,7 @@ func (p *Publisher) Start() context.Context {
 
 			p.Publish(&exBlock, "block")
 		}
-	}()
-	return p.Service.Start()
+	}
 }
 
 func (p *Publisher) Close() error {

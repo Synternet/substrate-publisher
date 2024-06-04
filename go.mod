@@ -6,7 +6,7 @@ require (
 	github.com/centrifuge/go-substrate-rpc-client/v4 v4.2.1
 	github.com/nats-io/nats.go v1.25.0
 	github.com/spf13/cobra v1.7.0
-	github.com/synternet/data-layer-sdk v0.3.0
+	github.com/synternet/data-layer-sdk v0.3.1
 	github.com/vedhavyas/go-subkey v1.0.4
 )
 
@@ -17,7 +17,7 @@ require (
 	github.com/klauspost/compress v1.16.6 // indirect
 	github.com/pierrec/xxHash v0.1.5 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
-	google.golang.org/protobuf v1.31.0 // indirect
+	google.golang.org/protobuf v1.31.0
 )
 
 require (

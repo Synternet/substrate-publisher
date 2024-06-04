@@ -6,6 +6,7 @@ import (
 
 	"github.com/nats-io/nats.go"
 	"github.com/spf13/cobra"
+	"github.com/synternet/data-layer-sdk/pkg/network"
 	"github.com/synternet/data-layer-sdk/pkg/options"
 )
 
@@ -30,6 +31,12 @@ var rootCmd = &cobra.Command{
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		log.SetFlags(0)
 		var err error
+
+		err = network.SetDefault("testnet")
+		if err != nil {
+			panic(err)
+		}
+
 		natsConnection, err = options.MakeNats("Substrate Publisher", *flagNatsUrls, *flagUserCreds, *flagNkey, *flagJWT, *flagCACert, *flagTLSClientCert, *flagTLSKey)
 		if err != nil {
 			panic(err)
